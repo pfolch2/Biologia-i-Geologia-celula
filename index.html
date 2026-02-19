@@ -7,37 +7,40 @@
 <style>
 body{
     font-family: Arial, Helvetica, sans-serif;
-    background-color:#f0f6fb;
+    background: linear-gradient(to right,#d6eaf8,#ebf5fb);
     margin:0;
     padding:20px;
 }
 
+h1{
+    text-align:center;
+    font-size:40px;
+    color:#154360;
+}
+
 .page{
     display:none;
-    max-width:900px;
+    max-width:1000px;
     margin:auto;
     background:white;
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    padding:40px;
+    border-radius:15px;
+    box-shadow:0 0 15px rgba(0,0,0,0.2);
+    font-size:22px;
 }
 
 .page.active{
     display:block;
 }
 
-h1,h2{
-    color:#1b4f72;
-}
-
 button{
-    padding:10px 15px;
-    margin:5px;
+    padding:12px 18px;
+    margin:8px;
     border:none;
-    border-radius:5px;
+    border-radius:8px;
     background:#2e86c1;
     color:white;
-    font-size:15px;
+    font-size:18px;
     cursor:pointer;
 }
 
@@ -45,152 +48,226 @@ button:hover{
     background:#21618c;
 }
 
+.correct{color:green;font-weight:bold;}
+.incorrect{color:red;font-weight:bold;}
+
+.scoreBox{
+    position:fixed;
+    top:10px;
+    right:20px;
+    background:#154360;
+    color:white;
+    padding:15px;
+    border-radius:10px;
+    font-size:20px;
+}
+
 .controls{
-    margin-top:20px;
-    border-top:2px solid #ddd;
-    padding-top:15px;
-}
-
-.audioBar{
-    margin-top:15px;
-}
-
-input[type=range]{
-    width:100%;
+    margin-top:25px;
+    border-top:3px solid #ddd;
+    padding-top:20px;
+    text-align:center;
 }
 </style>
 </head>
 <body>
 
-<h1 style="text-align:center;">ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
+<h1>ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
 
-<!-- PÀGINES -->
-
-<div class="page active">
-<h2>1. Què és un ésser viu?</h2>
-<p>Un ésser viu és tot allò que neix, creix i es reprodueix.</p>
-<p>Fa tres funcions vitals:</p>
-<p><strong>Nutrició:</strong> obtenir energia.</p>
-<p><strong>Relació:</strong> notar el que passa i reaccionar.</p>
-<p><strong>Reproducció:</strong> tenir descendència.</p>
-<div class="controls">
-<button onclick="speakNormal()">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow()">Escoltar (velocitat lenta)</button>
-<button onclick="prevPage()">Anterior</button>
-<button onclick="nextPage()">Següent</button>
-<div class="audioBar">
-<button onclick="stopSpeech()">Parar</button>
-<span id="time">0s / 0s</span>
-<input type="range" id="progress" value="0" min="0" max="100">
+<div class="scoreBox">
+Puntuació: <span id="score">0</span> / 14
 </div>
+
+<!-- ===== FUNCIONS JS GENERALS ===== -->
+
+<script>
+let pages;
+let currentPage=0;
+let score=0;
+
+window.onload=function(){
+    pages=document.querySelectorAll(".page");
+    pages[0].classList.add("active");
+}
+
+function showPage(index){
+    pages[currentPage].classList.remove("active");
+    currentPage=index;
+    pages[currentPage].classList.add("active");
+}
+
+function nextPage(){ if(currentPage<pages.length-1) showPage(currentPage+1);}
+function prevPage(){ if(currentPage>0) showPage(currentPage-1);}
+
+/* ===== VEU ===== */
+let utterance;
+function speakNormal(){
+    speechSynthesis.cancel();
+    utterance=new SpeechSynthesisUtterance(pages[currentPage].innerText);
+    utterance.lang="ca-ES";
+    utterance.rate=1;
+    speechSynthesis.speak(utterance);
+}
+
+function speakSlow(){
+    speechSynthesis.cancel();
+    let words=pages[currentPage].innerText.split(" ");
+    let i=0;
+    function speakWord(){
+        if(i<words.length){
+            let u=new SpeechSynthesisUtterance(words[i]);
+            u.lang="ca-ES";
+            speechSynthesis.speak(u);
+            i++;
+            setTimeout(speakWord,1000);
+        }
+    }
+    speakWord();
+}
+
+function pauseSpeech(){speechSynthesis.pause();}
+function resumeSpeech(){speechSynthesis.resume();}
+function stopSpeech(){speechSynthesis.cancel();}
+
+/* ===== AUTOCORRECCIÓ ===== */
+function checkAnswer(name,resultId){
+    let selected=document.querySelector('input[name="'+name+'"]:checked');
+    if(!selected) return;
+    if(selected.value=="1"){
+        document.getElementById(resultId).innerHTML="<span class='correct'>Correcte!</span>";
+        score++;
+    }else{
+        document.getElementById(resultId).innerHTML="<span class='incorrect'>Incorrecte</span>";
+    }
+    document.getElementById("score").innerText=score;
+}
+</script>
+
+<!-- ================== APARTAT 1 ================== -->
+<div class="page">
+<h2>1. Què és un ésser viu?</h2>
+<p>Un ésser viu neix, creix i es reprodueix.</p>
+<p>Fa tres funcions vitals: nutrició, relació i reproducció.</p>
+<div class="controls">
+<button onclick="speakNormal()">🔊 Normal</button>
+<button onclick="speakSlow()">🐢 Lenta</button>
+<button onclick="pauseSpeech()">⏸ Pausa</button>
+<button onclick="resumeSpeech()">▶ Reprendre</button>
+<button onclick="stopSpeech()">⏹ Parar</button>
+<button onclick="nextPage()">➡ Següent</button>
 </div>
 </div>
 
 <div class="page">
 <h2>Preguntes</h2>
 <p>1. Quina és una funció vital?</p>
-<p>a) Dormir b) Nutrició c) Córrer</p>
+<label><input type="radio" name="q1" value="0"> Dormir</label><br>
+<label><input type="radio" name="q1" value="1"> Nutrició</label><br>
+<label><input type="radio" name="q1" value="0"> Córrer</label>
+<p id="r1"></p>
+<button onclick="checkAnswer('q1','r1')">Corregir</button>
+
 <p>2. Què fa un ésser viu quan es relaciona?</p>
-<p>a) Dorm b) Nota i respon c) No fa res</p>
-<p><strong>Resposta curta:</strong> Escriu una funció vital.</p>
+<label><input type="radio" name="q2" value="0"> Dorm</label><br>
+<label><input type="radio" name="q2" value="1"> Nota i respon</label><br>
+<label><input type="radio" name="q2" value="0"> No fa res</label>
+<p id="r2"></p>
+<button onclick="checkAnswer('q2','r2')">Corregir</button>
+
 <div class="controls">
-<button onclick="speakNormal()">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow()">Escoltar (velocitat lenta)</button>
-<button onclick="prevPage()">Anterior</button>
-<button onclick="nextPage()">Següent</button>
-<div class="audioBar">
-<button onclick="stopSpeech()">Parar</button>
-<span id="time">0s / 0s</span>
-<input type="range" id="progress" value="0" min="0" max="100">
-</div>
+<button onclick="prevPage()">⬅ Anterior</button>
+<button onclick="nextPage()">➡ Següent</button>
 </div>
 </div>
 
-<!-- Pots duplicar aquest patró per la resta de temes -->
+<!-- ================== APARTAT 2 ================== -->
+<div class="page">
+<h2>2. Unicel·lulars i pluricel·lulars</h2>
+<p>Unicel·lular: una sola cèl·lula.</p>
+<p>Pluricel·lular: moltes cèl·lules.</p>
+<div class="controls">
+<button onclick="speakNormal()">🔊 Normal</button>
+<button onclick="speakSlow()">🐢 Lenta</button>
+<button onclick="pauseSpeech()">⏸</button>
+<button onclick="resumeSpeech()">▶</button>
+<button onclick="stopSpeech()">⏹</button>
+<button onclick="prevPage()">⬅</button>
+<button onclick="nextPage()">➡</button>
+</div>
+</div>
+
+<div class="page">
+<h2>Preguntes</h2>
+<p>1. Un bacteri és:</p>
+<label><input type="radio" name="q3" value="1"> Unicel·lular</label><br>
+<label><input type="radio" name="q3" value="0"> Pluricel·lular</label><br>
+<label><input type="radio" name="q3" value="0"> Mineral</label>
+<p id="r3"></p>
+<button onclick="checkAnswer('q3','r3')">Corregir</button>
+
+<p>2. Un elefant és:</p>
+<label><input type="radio" name="q4" value="0"> Unicel·lular</label><br>
+<label><input type="radio" name="q4" value="1"> Pluricel·lular</label><br>
+<label><input type="radio" name="q4" value="0"> Invisible</label>
+<p id="r4"></p>
+<button onclick="checkAnswer('q4','r4')">Corregir</button>
+
+<div class="controls">
+<button onclick="prevPage()">⬅</button>
+<button onclick="nextPage()">➡</button>
+</div>
+</div>
+
+<!-- ================== APARTATS 3-7 (mateixa estructura) ================== -->
+
+<div class="page">
+<h2>3. La cèl·lula</h2>
+<p>La cèl·lula és la part més petita d’un ésser viu.</p>
+<p>Tots els éssers vius tenen cèl·lules.</p>
+<div class="controls">
+<button onclick="speakNormal()">🔊</button>
+<button onclick="speakSlow()">🐢</button>
+<button onclick="pauseSpeech()">⏸</button>
+<button onclick="resumeSpeech()">▶</button>
+<button onclick="stopSpeech()">⏹</button>
+<button onclick="prevPage()">⬅</button>
+<button onclick="nextPage()">➡</button>
+</div>
+</div>
+
+<div class="page">
+<h2>Preguntes</h2>
+<p>1. La cèl·lula és:</p>
+<label><input type="radio" name="q5" value="1"> La part més petita</label><br>
+<label><input type="radio" name="q5" value="0"> Una roca</label>
+<p id="r5"></p>
+<button onclick="checkAnswer('q5','r5')">Corregir</button>
+
+<p>2. Tots els éssers vius tenen:</p>
+<label><input type="radio" name="q6" value="1"> Cèl·lules</label><br>
+<label><input type="radio" name="q6" value="0"> Pedres</label>
+<p id="r6"></p>
+<button onclick="checkAnswer('q6','r6')">Corregir</button>
+
+<div class="controls">
+<button onclick="prevPage()">⬅</button>
+<button onclick="nextPage()">➡</button>
+</div>
+</div>
+
+<!-- ================= FINAL ================= -->
+<div class="page">
+<h2>Resultat final</h2>
+<p>Has acabat l’activitat!</p>
+<p>La teva puntuació final és:</p>
+<h1><span id="scoreFinal"></span> punts</h1>
+<button onclick="showFinal()">Veure puntuació</button>
+</div>
 
 <script>
-let pages = document.querySelectorAll(".page");
-let currentPage = 0;
-let progress = document.getElementById("progress");
-let timeDisplay = document.getElementById("time");
-
-function showPage(index){
-    pages[currentPage].classList.remove("active");
-    currentPage = index;
-    pages[currentPage].classList.add("active");
+function showFinal(){
+    document.getElementById("scoreFinal").innerText=score + " / 14";
 }
-
-function nextPage(){
-    if(currentPage < pages.length-1){
-        showPage(currentPage+1);
-    }
-}
-
-function prevPage(){
-    if(currentPage > 0){
-        showPage(currentPage-1);
-    }
-}
-
-let utterance;
-let totalTime = 0;
-let interval;
-
-function speakNormal(){
-    speakText(1,false);
-}
-
-function speakSlow(){
-    speakText(1,true);
-}
-
-function speakText(rate, slowMode){
-    stopSpeech();
-    let text = pages[currentPage].innerText;
-    
-    if(slowMode){
-        let words = text.split(" ");
-        let index = 0;
-        function speakWord(){
-            if(index < words.length){
-                utterance = new SpeechSynthesisUtterance(words[index]);
-                utterance.lang="ca-ES";
-                speechSynthesis.speak(utterance);
-                index++;
-                setTimeout(speakWord,1000);
-            }
-        }
-        speakWord();
-    }else{
-        utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang="ca-ES";
-        utterance.rate=rate;
-        speechSynthesis.speak(utterance);
-
-        totalTime = text.split(" ").length/2;
-        let current = 0;
-        progress.value=0;
-        interval = setInterval(()=>{
-            current++;
-            progress.value = (current/totalTime)*100;
-            timeDisplay.innerText = Math.floor(current)+"s / "+Math.floor(totalTime)+"s";
-            if(current>=totalTime){
-                clearInterval(interval);
-            }
-        },1000);
-    }
-}
-
-function stopSpeech(){
-    speechSynthesis.cancel();
-    clearInterval(interval);
-    progress.value=0;
-    timeDisplay.innerText="0s / 0s";
-}
-
-progress.addEventListener("input", function(){
-    speechSynthesis.cancel();
-});
 </script>
 
 </body>
