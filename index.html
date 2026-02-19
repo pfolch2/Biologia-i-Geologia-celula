@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Els éssers vius i la cèl·lula - Cicle Mitjà</title>
-
 <style>
 body{
     font-family: Arial, Helvetica, sans-serif;
@@ -11,13 +10,7 @@ body{
     margin:0;
     padding:20px;
 }
-
-h1{
-    text-align:center;
-    font-size:36px;
-    color:#154360;
-}
-
+h1{ text-align:center; font-size:36px; color:#154360; }
 .page{
     display:none;
     max-width:1000px;
@@ -28,9 +21,7 @@ h1{
     box-shadow:0 0 15px rgba(0,0,0,0.2);
     font-size:22px;
 }
-
 .page.active{ display:block; }
-
 button{
     padding:10px 16px;
     margin:6px;
@@ -41,12 +32,9 @@ button{
     font-size:18px;
     cursor:pointer;
 }
-
 button:hover{ background:#21618c; }
-
 .correct{ color:green; font-weight:bold; }
 .incorrect{ color:red; font-weight:bold; }
-
 .scoreBox{
     position:fixed;
     top:10px;
@@ -57,49 +45,42 @@ button:hover{ background:#21618c; }
     border-radius:10px;
     font-size:20px;
 }
-
 .controls{
     margin-top:25px;
     border-top:3px solid #ddd;
     padding-top:20px;
     text-align:center;
 }
+.readable{
+    user-select:none;
+}
 </style>
 </head>
 <body>
 
 <h1>ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
-
-<div class="scoreBox">
-Puntuació: <span id="score">0</span> / 6
-</div>
+<div class="scoreBox">Puntuació: <span id="score">0</span> / 6</div>
 
 <script>
 let pages;
 let currentPage=0;
 let score=0;
-
-window.onload=function(){
-    pages=document.querySelectorAll(".page");
-    pages[0].classList.add("active");
-}
+window.onload=function(){ pages=document.querySelectorAll(".page"); pages[0].classList.add("active"); }
 
 function showPage(index){
     pages[currentPage].classList.remove("active");
     currentPage=index;
     pages[currentPage].classList.add("active");
 }
-
 function nextPage(){ if(currentPage<pages.length-1) showPage(currentPage+1);}
-function prevPage(){ if(currentPage>0) showPage(currentPage-1);}
+function prevPage(){ if(currentPage>0) showPage(currentPage-1); }
 
-/* ====== VEU (només contingut readable) ====== */
+/* VEU */
 let utterance;
-
 function getReadableText(){
-    return pages[currentPage].querySelector(".readable").innerText;
+    let r=pages[currentPage].querySelector(".readable");
+    return r ? r.innerText : "";
 }
-
 function speakNormal(){
     speechSynthesis.cancel();
     utterance=new SpeechSynthesisUtterance(getReadableText());
@@ -107,7 +88,6 @@ function speakNormal(){
     utterance.rate=1;
     speechSynthesis.speak(utterance);
 }
-
 function speakSlow(){
     speechSynthesis.cancel();
     let words=getReadableText().split(" ");
@@ -123,40 +103,30 @@ function speakSlow(){
     }
     speakWord();
 }
-
 function pauseSpeech(){ speechSynthesis.pause(); }
 function resumeSpeech(){ speechSynthesis.resume(); }
 function stopSpeech(){ speechSynthesis.cancel(); }
 
-/* ===== AUTOCORRECCIÓ ===== */
+/* AUTOCORRECCIÓ */
 function checkAnswer(name,resultId){
     let selected=document.querySelector('input[name="'+name+'"]:checked');
     if(!selected) return;
-    if(selected.value=="1"){
-        document.getElementById(resultId).innerHTML="<span class='correct'>Correcte!</span>";
-        score++;
-    }else{
-        document.getElementById(resultId).innerHTML="<span class='incorrect'>Incorrecte</span>";
-    }
+    if(selected.value=="1"){ document.getElementById(resultId).innerHTML="<span class='correct'>Correcte!</span>"; score++; }
+    else{ document.getElementById(resultId).innerHTML="<span class='incorrect'>Incorrecte</span>"; }
     document.getElementById("score").innerText=score;
 }
 </script>
 
-<!-- ================= APARTAT 1 ================= -->
-
+<!-- ============ APARTAT 1 ============ -->
 <div class="page">
 <h2>Què és un ésser viu?</h2>
-
 <div class="readable">
 <p>Un ésser viu és tot allò que neix, creix, es relaciona i es reprodueix.</p>
-
 <p>Els éssers vius fan tres funcions vitals:</p>
-
 <p><strong>Nutrició:</strong> mengen o fabriquen aliment per tenir energia.</p>
 <p><strong>Relació:</strong> noten el que passa al seu voltant i reaccionen.</p>
 <p><strong>Reproducció:</strong> poden tenir fills o descendència.</p>
 </div>
-
 <div class="controls">
 <button onclick="speakNormal()">🔊 Normal</button>
 <button onclick="speakSlow()">🐢 Lenta</button>
@@ -169,26 +139,21 @@ function checkAnswer(name,resultId){
 
 <div class="page">
 <h2>Preguntes</h2>
-
-<div class="readable">
-<p>Quina és una funció vital?</p>
-</div>
-
+<div class="readable"><p>Quina és una funció vital?</p></div>
 <label><input type="radio" name="q1" value="0"> Dormir</label><br>
 <label><input type="radio" name="q1" value="1"> Nutrició</label><br>
 <label><input type="radio" name="q1" value="0"> Córrer</label>
 <p id="r1"></p>
 <button onclick="checkAnswer('q1','r1')">Corregir</button>
 
-<div class="readable">
-<p>Què fa un ésser viu quan es relaciona?</p>
-</div>
-
-<label><input type="radio" name="q2" value="0"> Dorm</label><br>
-<label><input type="radio" name="q2" value="1"> Nota i respon</label><br>
+<div class="readable"><p>Què fa un ésser viu quan es relaciona?</p></div>
+<label><input type="radio" name="q2" value="0"> Dorm tot el dia</label><br>
+<label><input type="radio" name="q2" value="1"> Nota el que passa i respon</label><br>
 <label><input type="radio" name="q2" value="0"> No fa res</label>
 <p id="r2"></p>
 <button onclick="checkAnswer('q2','r2')">Corregir</button>
+
+<div class="readable"><p>Resposta curta: Escriu el nom d’una funció vital.</p></div>
 
 <div class="controls">
 <button onclick="prevPage()">⬅ Anterior</button>
@@ -196,19 +161,16 @@ function checkAnswer(name,resultId){
 </div>
 </div>
 
-<!-- ================= APARTAT 2 ================= -->
-
+<!-- ============ APARTAT 2 ============ -->
 <div class="page">
 <h2>Éssers unicel·lulars i pluricel·lulars</h2>
-
 <div class="readable">
-<p><strong>Unicel·lulars:</strong> tenen una sola cèl·lula. Exemple: bacteris.</p>
-<p><strong>Pluricel·lulars:</strong> tenen moltes cèl·lules. Exemple: animals i plantes.</p>
+<p>Unicel·lulars: tenen una sola cèl·lula. Exemple: bacteris.</p>
+<p>Pluricel·lulars: tenen moltes cèl·lules. Exemple: animals i plantes.</p>
 </div>
-
 <div class="controls">
-<button onclick="speakNormal()">🔊</button>
-<button onclick="speakSlow()">🐢</button>
+<button onclick="speakNormal()">🔊 Normal</button>
+<button onclick="speakSlow()">🐢 Lenta</button>
 <button onclick="pauseSpeech()">⏸</button>
 <button onclick="resumeSpeech()">▶</button>
 <button onclick="stopSpeech()">⏹</button>
@@ -219,51 +181,42 @@ function checkAnswer(name,resultId){
 
 <div class="page">
 <h2>Preguntes</h2>
-
-<div class="readable">
-<p>Un bacteri és:</p>
-</div>
-
-<label><input type="radio" name="q3" value="1"> Unicel·lular</label><br>
+<div class="readable"><p>Un bacteri és:</p></div>
 <label><input type="radio" name="q3" value="0"> Pluricel·lular</label><br>
+<label><input type="radio" name="q3" value="1"> Unicel·lular</label><br>
 <label><input type="radio" name="q3" value="0"> Mineral</label>
 <p id="r3"></p>
 <button onclick="checkAnswer('q3','r3')">Corregir</button>
 
-<div class="readable">
-<p>Un elefant és:</p>
-</div>
-
+<div class="readable"><p>Un elefant és:</p></div>
 <label><input type="radio" name="q4" value="0"> Unicel·lular</label><br>
 <label><input type="radio" name="q4" value="1"> Pluricel·lular</label><br>
 <label><input type="radio" name="q4" value="0"> Invisible</label>
 <p id="r4"></p>
 <button onclick="checkAnswer('q4','r4')">Corregir</button>
 
+<div class="readable"><p>Resposta curta: Quina diferència hi ha entre unicel·lular i pluricel·lular?</p></div>
+
 <div class="controls">
 <button onclick="prevPage()">⬅</button>
 <button onclick="nextPage()">➡</button>
 </div>
 </div>
 
-<!-- ================= APARTAT 3 ================= -->
-
+<!-- ============ APARTAT 3 ============ -->
 <div class="page">
 <h2>Què és la cèl·lula?</h2>
-
 <div class="readable">
 <p>La cèl·lula és la part més petita d’un ésser viu.</p>
 <p>Tots els éssers vius estan formats per cèl·lules.</p>
-
 <p>Les cèl·lules:</p>
 <p>- Formen els éssers vius.</p>
 <p>- Fan les funcions vitals.</p>
 <p>- Contenen informació genètica (ADN).</p>
 </div>
-
 <div class="controls">
-<button onclick="speakNormal()">🔊</button>
-<button onclick="speakSlow()">🐢</button>
+<button onclick="speakNormal()">🔊 Normal</button>
+<button onclick="speakSlow()">🐢 Lenta</button>
 <button onclick="pauseSpeech()">⏸</button>
 <button onclick="resumeSpeech()">▶</button>
 <button onclick="stopSpeech()">⏹</button>
@@ -274,24 +227,21 @@ function checkAnswer(name,resultId){
 
 <div class="page">
 <h2>Preguntes</h2>
-
-<div class="readable">
-<p>La cèl·lula és:</p>
-</div>
-
+<div class="readable"><p>La cèl·lula és:</p></div>
+<label><input type="radio" name="q5" value="0"> Una roca</label><br>
 <label><input type="radio" name="q5" value="1"> La part més petita d’un ésser viu</label><br>
-<label><input type="radio" name="q5" value="0"> Una roca</label>
+<label><input type="radio" name="q5" value="0"> Un òrgan</label>
 <p id="r5"></p>
 <button onclick="checkAnswer('q5','r5')">Corregir</button>
 
-<div class="readable">
-<p>Tots els éssers vius estan formats per:</p>
-</div>
-
-<label><input type="radio" name="q6" value="1"> Cèl·lules</label><br>
-<label><input type="radio" name="q6" value="0"> Pedres</label>
+<div class="readable"><p>Tots els éssers vius estan formats per:</p></div>
+<label><input type="radio" name="q6" value="0"> Aigua</label><br>
+<label><input type="radio" name="q6" value="0"> Fusta</label><br>
+<label><input type="radio" name="q6" value="1"> Cèl·lules</label>
 <p id="r6"></p>
 <button onclick="checkAnswer('q6','r6')">Corregir</button>
+
+<div class="readable"><p>Resposta curta: Per què és important la cèl·lula?</p></div>
 
 <div class="controls">
 <button onclick="prevPage()">⬅</button>
