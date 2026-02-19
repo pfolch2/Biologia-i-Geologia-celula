@@ -2,24 +2,24 @@
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
-<title>Els éssers vius i la cèl·lula</title>
+<title>Els éssers vius i la cèl·lula - Cicle Mitjà</title>
 
 <style>
 body{
     font-family: Arial, Helvetica, sans-serif;
-    background-color: #f4f8fb;
-    margin: 0;
-    padding: 20px;
+    background-color:#f0f6fb;
+    margin:0;
+    padding:20px;
 }
 
 .page{
-    display: none;
-    max-width: 900px;
-    margin: auto;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display:none;
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
 }
 
 .page.active{
@@ -35,14 +35,14 @@ button{
     margin:5px;
     border:none;
     border-radius:5px;
-    background-color:#2e86c1;
+    background:#2e86c1;
     color:white;
-    font-size:16px;
+    font-size:15px;
     cursor:pointer;
 }
 
 button:hover{
-    background-color:#21618c;
+    background:#21618c;
 }
 
 .controls{
@@ -50,160 +50,147 @@ button:hover{
     border-top:2px solid #ddd;
     padding-top:15px;
 }
+
+.audioBar{
+    margin-top:15px;
+}
+
+input[type=range]{
+    width:100%;
+}
 </style>
 </head>
-
 <body>
 
-<!-- PÀGINA 1 TEORIA -->
+<h1 style="text-align:center;">ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
+
+<!-- PÀGINES -->
+
 <div class="page active">
-<h1>ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
 <h2>1. Què és un ésser viu?</h2>
-
-<p>Un ésser viu és tot aquell que pot realitzar les tres funcions vitals: nutrició, relació i reproducció.</p>
-
-<p><strong>Nutrició:</strong> Permet obtenir matèria i energia per viure. Exemple: una planta fabrica el seu aliment amb la llum del Sol.</p>
-
-<p><strong>Relació:</strong> Capacitat de captar estímuls i reaccionar-hi. Exemple: una persona aparta la mà quan toca alguna cosa molt calenta.</p>
-
-<p><strong>Reproducció:</strong> Permet tenir descendència. Exemple: un gat té cadells.</p>
-
+<p>Un ésser viu és tot allò que neix, creix i es reprodueix.</p>
+<p>Fa tres funcions vitals:</p>
+<p><strong>Nutrició:</strong> obtenir energia.</p>
+<p><strong>Relació:</strong> notar el que passa i reaccionar.</p>
+<p><strong>Reproducció:</strong> tenir descendència.</p>
 <div class="controls">
-<button onclick="speak(1)">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow(1)">Escoltar (velocitat lenta)</button>
-<button onclick="nextPage()">Següent pàgina</button>
+<button onclick="speakNormal()">Escoltar (velocitat normal)</button>
+<button onclick="speakSlow()">Escoltar (velocitat lenta)</button>
+<button onclick="prevPage()">Anterior</button>
+<button onclick="nextPage()">Següent</button>
+<div class="audioBar">
+<button onclick="stopSpeech()">Parar</button>
+<span id="time">0s / 0s</span>
+<input type="range" id="progress" value="0" min="0" max="100">
+</div>
 </div>
 </div>
 
-<!-- PÀGINA 2 ACTIVITATS -->
 <div class="page">
-<h2>Activitats 1</h2>
-
-<p><strong>Tria la resposta correcta:</strong> Quina NO és una funció vital?</p>
-<p>a) Nutrició &nbsp;&nbsp; b) Relació &nbsp;&nbsp; c) Evaporació</p>
-
-<p><strong>Resposta curta:</strong> Escriu un exemple de funció de relació en animals.</p>
-
+<h2>Preguntes</h2>
+<p>1. Quina és una funció vital?</p>
+<p>a) Dormir b) Nutrició c) Córrer</p>
+<p>2. Què fa un ésser viu quan es relaciona?</p>
+<p>a) Dorm b) Nota i respon c) No fa res</p>
+<p><strong>Resposta curta:</strong> Escriu una funció vital.</p>
 <div class="controls">
-<button onclick="speak(2)">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow(2)">Escoltar (velocitat lenta)</button>
-<button onclick="nextPage()">Següent pàgina</button>
+<button onclick="speakNormal()">Escoltar (velocitat normal)</button>
+<button onclick="speakSlow()">Escoltar (velocitat lenta)</button>
+<button onclick="prevPage()">Anterior</button>
+<button onclick="nextPage()">Següent</button>
+<div class="audioBar">
+<button onclick="stopSpeech()">Parar</button>
+<span id="time">0s / 0s</span>
+<input type="range" id="progress" value="0" min="0" max="100">
 </div>
-</div>
-
-<!-- PÀGINA 3 TEORIA -->
-<div class="page">
-<h2>2. Éssers unicel·lulars i pluricel·lulars</h2>
-
-<p><strong>Unicel·lulars:</strong> Formats per una sola cèl·lula que fa totes les funcions vitals. Exemple: bacteris.</p>
-
-<p><strong>Pluricel·lulars:</strong> Formats per moltes cèl·lules especialitzades. Exemple: animals i plantes.</p>
-
-<div class="controls">
-<button onclick="speak(3)">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow(3)">Escoltar (velocitat lenta)</button>
-<button onclick="nextPage()">Següent pàgina</button>
 </div>
 </div>
 
-<!-- PÀGINA 4 ACTIVITATS -->
-<div class="page">
-<h2>Activitats 2</h2>
-
-<p>Relaciona:</p>
-<p>Bacteri → ________</p>
-<p>Elefant → ________</p>
-<p>a) Pluricel·lular</p>
-<p>b) Unicel·lular</p>
-
-<div class="controls">
-<button onclick="speak(4)">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow(4)">Escoltar (velocitat lenta)</button>
-<button onclick="nextPage()">Següent pàgina</button>
-</div>
-</div>
-
-<!-- PÀGINA 5 TEORIA -->
-<div class="page">
-<h2>3. Què és la cèl·lula?</h2>
-
-<p>La cèl·lula és la unitat bàsica de tots els éssers vius.</p>
-
-<p><strong>Teoria cel·lular:</strong></p>
-<p>Unitat estructural: tots els éssers vius estan formats per cèl·lules.</p>
-<p>Unitat funcional: les cèl·lules realitzen les funcions vitals.</p>
-<p>Unitat reproductora: totes les cèl·lules provenen d’altres cèl·lules.</p>
-<p>Unitat genètica: conté el material genètic (ADN o ARN).</p>
-
-<div class="controls">
-<button onclick="speak(5)">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow(5)">Escoltar (velocitat lenta)</button>
-<button onclick="nextPage()">Següent pàgina</button>
-</div>
-</div>
-
-<!-- PÀGINA 6 ACTIVITATS -->
-<div class="page">
-<h2>Activitats 3</h2>
-
-<p>Omple els buits amb: genètica – reproductora – estructural – funcional.</p>
-
-<p>La cèl·lula és la unitat ______ perquè forma els éssers vius i la unitat ______ perquè realitza les funcions vitals. També és la unitat ______ perquè conté l’ADN i la unitat ______ perquè totes provenen d’una altra cèl·lula.</p>
-
-<div class="controls">
-<button onclick="speak(6)">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow(6)">Escoltar (velocitat lenta)</button>
-<button onclick="nextPage()">Següent pàgina</button>
-</div>
-</div>
-
-<!-- PÀGINA 7 RESUM FINAL -->
-<div class="page">
-<h2>Taula resum</h2>
-
-<p>Funcions vitals: Nutrició, relació i reproducció</p>
-<p>Cèl·lula: Unitat bàsica dels éssers vius</p>
-<p>Procariota: Sense nucli</p>
-<p>Eucariota: Amb nucli</p>
-<p>Mitocondri: Obté energia</p>
-<p>Cloroplast: Fa la fotosíntesi</p>
-
-<div class="controls">
-<button onclick="speak(7)">Escoltar (velocitat normal)</button>
-<button onclick="speakSlow(7)">Escoltar (velocitat lenta)</button>
-</div>
-</div>
+<!-- Pots duplicar aquest patró per la resta de temes -->
 
 <script>
-let currentPage = 0;
 let pages = document.querySelectorAll(".page");
+let currentPage = 0;
+let progress = document.getElementById("progress");
+let timeDisplay = document.getElementById("time");
 
-function nextPage(){
+function showPage(index){
     pages[currentPage].classList.remove("active");
-    currentPage++;
-    if(currentPage >= pages.length){
-        currentPage = 0;
-    }
+    currentPage = index;
     pages[currentPage].classList.add("active");
 }
 
-function speak(pageNumber){
-    let text = pages[currentPage].innerText;
-    let utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "ca-ES";
-    utterance.rate = 1;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
+function nextPage(){
+    if(currentPage < pages.length-1){
+        showPage(currentPage+1);
+    }
 }
 
-function speakSlow(pageNumber){
-    let text = pages[currentPage].innerText;
-    let utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "ca-ES";
-    utterance.rate = 0.7;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
+function prevPage(){
+    if(currentPage > 0){
+        showPage(currentPage-1);
+    }
 }
+
+let utterance;
+let totalTime = 0;
+let interval;
+
+function speakNormal(){
+    speakText(1,false);
+}
+
+function speakSlow(){
+    speakText(1,true);
+}
+
+function speakText(rate, slowMode){
+    stopSpeech();
+    let text = pages[currentPage].innerText;
+    
+    if(slowMode){
+        let words = text.split(" ");
+        let index = 0;
+        function speakWord(){
+            if(index < words.length){
+                utterance = new SpeechSynthesisUtterance(words[index]);
+                utterance.lang="ca-ES";
+                speechSynthesis.speak(utterance);
+                index++;
+                setTimeout(speakWord,1000);
+            }
+        }
+        speakWord();
+    }else{
+        utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang="ca-ES";
+        utterance.rate=rate;
+        speechSynthesis.speak(utterance);
+
+        totalTime = text.split(" ").length/2;
+        let current = 0;
+        progress.value=0;
+        interval = setInterval(()=>{
+            current++;
+            progress.value = (current/totalTime)*100;
+            timeDisplay.innerText = Math.floor(current)+"s / "+Math.floor(totalTime)+"s";
+            if(current>=totalTime){
+                clearInterval(interval);
+            }
+        },1000);
+    }
+}
+
+function stopSpeech(){
+    speechSynthesis.cancel();
+    clearInterval(interval);
+    progress.value=0;
+    timeDisplay.innerText="0s / 0s";
+}
+
+progress.addEventListener("input", function(){
+    speechSynthesis.cancel();
+});
 </script>
 
 </body>
