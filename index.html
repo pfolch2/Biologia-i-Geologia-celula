@@ -25,17 +25,8 @@ h1{text-align:center;}
 
 .page.active{display:block;}
 
-.readable span{
-  cursor:default;
-}
-
-.highlight-normal{
-  background:#fff176;
-}
-
-.highlight-slow{
-  background:#81d4fa;
-}
+.highlight-normal{ background:#fff176; }
+.highlight-slow{ background:#81d4fa; }
 
 .controls{
   margin-top:20px;
@@ -79,9 +70,7 @@ button:hover{background:#21618c;}
   cursor:pointer;
 }
 
-.option:hover{
-  background:#f0f0f0;
-}
+.option:hover{ background:#f0f0f0; }
 
 .correct{color:green;font-weight:bold;}
 .incorrect{color:red;font-weight:bold;}
@@ -99,7 +88,6 @@ let words=[];
 let currentIndex=0;
 let speaking=false;
 let mode="normal";
-let slowDelayActive=false;
 
 window.onload=function(){
   pages=document.querySelectorAll(".page");
@@ -140,7 +128,12 @@ function startReading(selectedMode){
   stopReading();
   speaking=true;
   mode=selectedMode;
-  speakWord();
+
+  if(mode==="full"){
+    readFullText();
+  }else{
+    speakWord();
+  }
 }
 
 function speakWord(){
@@ -169,6 +162,20 @@ function speakWord(){
       updateProgress();
       speakWord();
     }
+  };
+
+  speechSynthesis.speak(utter);
+}
+
+function readFullText(){
+  let readable=pages[currentPage].querySelector(".readable");
+  let text=readable.innerText;
+
+  let utter=new SpeechSynthesisUtterance(text);
+  utter.lang="ca-ES";
+
+  utter.onend=function(){
+    speaking=false;
   };
 
   speechSynthesis.speak(utter);
@@ -237,6 +244,7 @@ function selectOption(element,correct,resultId){
 </div>
 
 <div class="controls">
+<button onclick="startReading('full')">Lectura completa</button>
 <button onclick="startReading('normal')">Lectura normal</button>
 <button onclick="startReading('slow')">Lectura lenta</button>
 <button onclick="pauseReading()">Pausa</button>
@@ -279,6 +287,7 @@ function selectOption(element,correct,resultId){
 </div>
 
 <div class="controls">
+<button onclick="startReading('full')">Lectura completa</button>
 <button onclick="startReading('normal')">Lectura normal</button>
 <button onclick="startReading('slow')">Lectura lenta</button>
 <button onclick="pauseReading()">Pausa</button>
