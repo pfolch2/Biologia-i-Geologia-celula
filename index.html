@@ -32,12 +32,10 @@ h1{text-align:center;}
 
 .highlight-normal{
   background:#fff176;
-  border-radius:4px;
 }
 
 .highlight-slow{
   background:#81d4fa;
-  border-radius:4px;
 }
 
 .controls{
@@ -75,6 +73,17 @@ button:hover{background:#21618c;}
   transition:width 0.2s;
 }
 
+.option{
+  display:block;
+  margin:5px 0;
+  padding:5px;
+  cursor:pointer;
+}
+
+.option:hover{
+  background:#f0f0f0;
+}
+
 .correct{color:green;font-weight:bold;}
 .incorrect{color:red;font-weight:bold;}
 </style>
@@ -110,7 +119,7 @@ function loadVoices(){
   }
 }
 
-function getFemaleVoice(){
+function getVoice(){
   return voices.find(v => v.lang.includes("ca")) || null;
 }
 
@@ -152,7 +161,7 @@ function prepareText(){
 }
 
 function startReading(selectedMode){
-  stopReading();
+  speechSynthesis.cancel();
   speaking=true;
   paused=false;
   mode=selectedMode;
@@ -160,8 +169,7 @@ function startReading(selectedMode){
 }
 
 function speakWord(){
-  if(!speaking || currentIndex>=words.length) return;
-  if(paused) return;
+  if(!speaking || currentIndex>=words.length || paused) return;
 
   words.forEach(w=>{
     w.classList.remove("highlight-normal");
@@ -173,8 +181,7 @@ function speakWord(){
 
   let utter=new SpeechSynthesisUtterance(word.textContent);
   utter.lang="ca-ES";
-  utter.voice=getFemaleVoice();
-  utter.rate=1;
+  utter.voice=getVoice();
 
   utter.onend=function(){
     if(mode==="slow"){
@@ -195,13 +202,12 @@ function speakWord(){
 
 function pauseReading(){
   paused=true;
-  speechSynthesis.pause();
+  speechSynthesis.cancel();
 }
 
 function resumeReading(){
   if(paused){
     paused=false;
-    speechSynthesis.resume();
     speakWord();
   }
 }
@@ -224,10 +230,13 @@ function updateProgress(){
   if(bar) bar.style.width=percent+"%";
 }
 
-function checkAnswer(name,correct,resultId){
-  let selected=document.querySelector('input[name="'+name+'"]:checked');
-  if(!selected) return;
-  if(selected.value==correct){
+function selectOption(element,correct,resultId){
+  let options=element.parentNode.querySelectorAll(".option");
+  options.forEach(o=>o.style.fontWeight="normal");
+
+  element.style.fontWeight="bold";
+
+  if(correct){
     document.getElementById(resultId).innerHTML="<span class='correct'>Correcte!</span>";
   }else{
     document.getElementById(resultId).innerHTML="<span class='incorrect'>Incorrecte</span>";
@@ -276,33 +285,25 @@ function checkAnswer(name,correct,resultId){
 <h2>Preguntes</h2>
 
 <p>1. Quina és una funció vital?</p>
-<p>a) Dormir</p>
-<p>b) Nutrició</p>
-<p>c) Córrer</p>
+<div>
+<span class="option" onclick="selectOption(this,false,'r1')">Dormir</span>
+<span class="option" onclick="selectOption(this,true,'r1')">Nutrició</span>
+<span class="option" onclick="selectOption(this,false,'r1')">Córrer</span>
+</div>
+<p id="r1"></p>
 
 <p>2. Què fa un ésser viu quan es relaciona?</p>
-<p>a) Dorm tot el dia</p>
-<p>b) Nota el que passa i respon</p>
-<p>c) No fa res</p>
+<div>
+<span class="option" onclick="selectOption(this,false,'r2')">Dorm tot el dia</span>
+<span class="option" onclick="selectOption(this,true,'r2')">Nota el que passa i respon</span>
+<span class="option" onclick="selectOption(this,false,'r2')">No fa res</span>
+</div>
+<p id="r2"></p>
 
 <p>Resposta curta:</p>
 <p>Escriu el nom d’una funció vital.</p>
 
 </div>
-
-<input type="radio" name="q1" value="a"> Dormir<br>
-<input type="radio" name="q1" value="b"> Nutrició<br>
-<input type="radio" name="q1" value="c"> Córrer<br>
-<button onclick="checkAnswer('q1','b','r1')">Corregir</button>
-<p id="r1"></p>
-
-<br>
-
-<input type="radio" name="q2" value="a"> Dorm tot el dia<br>
-<input type="radio" name="q2" value="b"> Nota el que passa i respon<br>
-<input type="radio" name="q2" value="c"> No fa res<br>
-<button onclick="checkAnswer('q2','b','r2')">Corregir</button>
-<p id="r2"></p>
 
 <div class="progress-container">
 <div class="progress-bar"></div>
