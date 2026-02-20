@@ -78,7 +78,7 @@ button:hover{background:#21618c;}
 </head>
 <body>
 
-<h1>ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
+<h1>ELS ÉSSERS VIUS I LA CÈL·LULA (Cicle Mitjà)</h1>
 
 <script>
 let pages;
@@ -174,13 +174,20 @@ function readFullText(){
   let utter=new SpeechSynthesisUtterance(text);
   utter.lang="ca-ES";
 
-  utter.onend=function(){ speaking=false; };
+  utter.onend=function(){
+    speaking=false;
+  };
 
   speechSynthesis.speak(utter);
 }
 
-function pauseReading(){ speechSynthesis.pause(); }
-function resumeReading(){ speechSynthesis.resume(); }
+function pauseReading(){
+  speechSynthesis.pause();
+}
+
+function resumeReading(){
+  speechSynthesis.resume();
+}
 
 function stopReading(){
   speaking=false;
