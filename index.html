@@ -300,3 +300,316 @@ function selectOption(element,correct,resultId){
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Apartats 2 i 3</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to right,#e8f8f5,#d4efdf);
+  padding:20px;
+}
+
+h1{text-align:center;}
+
+.page{
+  display:none;
+  max-width:900px;
+  margin:auto;
+  background:white;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+.page.active{display:block;}
+
+.highlight-normal{ background:#fff176; }
+.highlight-slow{ background:#81d4fa; }
+
+.controls{
+  margin-top:20px;
+  text-align:center;
+  border-top:2px solid #ccc;
+  padding-top:15px;
+}
+
+button{
+  padding:8px 14px;
+  margin:5px;
+  border:none;
+  border-radius:6px;
+  background:#1e8449;
+  color:white;
+  cursor:pointer;
+}
+
+button:hover{background:#145a32;}
+
+.progress-container{
+  width:100%;
+  height:15px;
+  background:#ddd;
+  border-radius:10px;
+  margin-top:15px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:#28b463;
+  border-radius:10px;
+  transition:width 0.2s;
+}
+
+.option{
+  display:block;
+  margin:6px 0;
+  padding:6px;
+  cursor:pointer;
+}
+
+.option:hover{ background:#f0f0f0; }
+
+.correct{color:green;font-weight:bold;}
+.incorrect{color:red;font-weight:bold;}
+</style>
+</head>
+<body>
+
+<h1>ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
+
+<script>
+let pages;
+let currentPage=0;
+
+let words=[];
+let currentIndex=0;
+let speaking=false;
+let mode="normal";
+
+window.onload=function(){
+  pages=document.querySelectorAll(".page");
+  pages[0].classList.add("active");
+  prepareText();
+};
+
+function showPage(index){
+  stopReading();
+  pages[currentPage].classList.remove("active");
+  currentPage=index;
+  pages[currentPage].classList.add("active");
+  prepareText();
+}
+
+function nextPage(){ if(currentPage<pages.length-1) showPage(currentPage+1);}
+function prevPage(){ if(currentPage>0) showPage(currentPage-1);}
+
+function prepareText(){
+  let readable=pages[currentPage].querySelector(".readable");
+  if(!readable) return;
+
+  readable.querySelectorAll("p, h2").forEach(el=>{
+    let text=el.innerText;
+    el.innerHTML="";
+    text.split(" ").forEach(word=>{
+      let span=document.createElement("span");
+      span.textContent=word+" ";
+      el.appendChild(span);
+    });
+  });
+
+  words=readable.querySelectorAll("span");
+  updateProgress();
+}
+
+function startReading(selectedMode){
+  stopReading();
+  speaking=true;
+  mode=selectedMode;
+
+  if(mode==="full"){
+    readFullText();
+  }else{
+    speakWord();
+  }
+}
+
+function speakWord(){
+  if(!speaking || currentIndex>=words.length) return;
+
+  words.forEach(w=>{
+    w.classList.remove("highlight-normal");
+    w.classList.remove("highlight-slow");
+  });
+
+  let word=words[currentIndex];
+  word.classList.add(mode==="normal"?"highlight-normal":"highlight-slow");
+
+  let utter=new SpeechSynthesisUtterance(word.textContent);
+  utter.lang="ca-ES";
+
+  utter.onend=function(){
+    if(mode==="slow"){
+      setTimeout(()=>{
+        currentIndex++;
+        updateProgress();
+        speakWord();
+      },1000);
+    } else {
+      currentIndex++;
+      updateProgress();
+      speakWord();
+    }
+  };
+
+  speechSynthesis.speak(utter);
+}
+
+function readFullText(){
+  let readable=pages[currentPage].querySelector(".readable");
+  let text=readable.innerText;
+
+  let utter=new SpeechSynthesisUtterance(text);
+  utter.lang="ca-ES";
+
+  utter.onend=function(){ speaking=false; };
+
+  speechSynthesis.speak(utter);
+}
+
+function pauseReading(){ speechSynthesis.pause(); }
+function resumeReading(){ speechSynthesis.resume(); }
+
+function stopReading(){
+  speaking=false;
+  speechSynthesis.cancel();
+  words.forEach(w=>{
+    w.classList.remove("highlight-normal");
+    w.classList.remove("highlight-slow");
+  });
+  currentIndex=0;
+  updateProgress();
+}
+
+function updateProgress(){
+  let percent=(currentIndex/words.length)*100;
+  let bar=pages[currentPage].querySelector(".progress-bar");
+  if(bar) bar.style.width=percent+"%";
+}
+
+function selectOption(element,correct,resultId){
+  let siblings=element.parentNode.querySelectorAll(".option");
+  siblings.forEach(o=>o.style.fontWeight="normal");
+
+  element.style.fontWeight="bold";
+
+  if(correct){
+    document.getElementById(resultId).innerHTML="<span class='correct'>Correcte!</span>";
+  }else{
+    document.getElementById(resultId).innerHTML="<span class='incorrect'>Incorrecte</span>";
+  }
+}
+</script>
+
+<!-- ================= APARTAT 2 ================= -->
+
+<div class="page">
+<div class="readable">
+
+<h2>2. Éssers unicel·lulars i pluricel·lulars</h2>
+
+<p>Unicel·lulars: tenen una sola cèl·lula. Exemple: bacteris.</p>
+
+<p>Pluricel·lulars: tenen moltes cèl·lules. Exemple: animals i plantes.</p>
+
+<h2>Preguntes</h2>
+
+<p>1. Un bacteri és:</p>
+<div>
+<span class="option" onclick="selectOption(this,false,'r21')">a) Pluricel·lular</span>
+<span class="option" onclick="selectOption(this,true,'r21')">b) Unicel·lular</span>
+<span class="option" onclick="selectOption(this,false,'r21')">c) Mineral</span>
+</div>
+<p id="r21"></p>
+
+<p>2. Un elefant és:</p>
+<div>
+<span class="option" onclick="selectOption(this,false,'r22')">a) Unicel·lular</span>
+<span class="option" onclick="selectOption(this,true,'r22')">b) Pluricel·lular</span>
+<span class="option" onclick="selectOption(this,false,'r22')">c) Invisible</span>
+</div>
+<p id="r22"></p>
+
+<p>Resposta curta:</p>
+<p>Quina diferència hi ha entre unicel·lular i pluricel·lular?</p>
+
+</div>
+
+<div class="progress-container"><div class="progress-bar"></div></div>
+
+<div class="controls">
+<button onclick="startReading('full')">Lectura completa</button>
+<button onclick="startReading('normal')">Lectura normal</button>
+<button onclick="startReading('slow')">Lectura lenta</button>
+<button onclick="pauseReading()">Pausa</button>
+<button onclick="resumeReading()">Reprendre</button>
+<button onclick="stopReading()">Stop</button>
+<button onclick="nextPage()">Següent</button>
+</div>
+</div>
+
+<!-- ================= APARTAT 3 ================= -->
+
+<div class="page">
+<div class="readable">
+
+<h2>3. Què és la cèl·lula?</h2>
+
+<p>La cèl·lula és la part més petita d’un ésser viu.</p>
+
+<p>Tots els éssers vius estan formats per cèl·lules.</p>
+
+<p>Les cèl·lules formen els éssers vius, fan les funcions vitals i contenen informació genètica anomenada ADN.</p>
+
+<h2>Preguntes</h2>
+
+<p>1. La cèl·lula és:</p>
+<div>
+<span class="option" onclick="selectOption(this,false,'r31')">a) Una roca</span>
+<span class="option" onclick="selectOption(this,true,'r31')">b) La part més petita d’un ésser viu</span>
+<span class="option" onclick="selectOption(this,false,'r31')">c) Un òrgan</span>
+</div>
+<p id="r31"></p>
+
+<p>2. Tots els éssers vius estan formats per:</p>
+<div>
+<span class="option" onclick="selectOption(this,false,'r32')">a) Aigua</span>
+<span class="option" onclick="selectOption(this,false,'r32')">b) Fusta</span>
+<span class="option" onclick="selectOption(this,true,'r32')">c) Cèl·lules</span>
+</div>
+<p id="r32"></p>
+
+<p>Resposta curta:</p>
+<p>Per què és important la cèl·lula?</p>
+
+</div>
+
+<div class="progress-container"><div class="progress-bar"></div></div>
+
+<div class="controls">
+<button onclick="startReading('full')">Lectura completa</button>
+<button onclick="startReading('normal')">Lectura normal</button>
+<button onclick="startReading('slow')">Lectura lenta</button>
+<button onclick="pauseReading()">Pausa</button>
+<button onclick="resumeReading()">Reprendre</button>
+<button onclick="stopReading()">Stop</button>
+<button onclick="prevPage()">Anterior</button>
+</div>
+</div>
+
+</body>
+</html>
