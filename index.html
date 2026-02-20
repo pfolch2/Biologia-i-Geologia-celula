@@ -80,9 +80,9 @@ button:hover{background:#21618c;}
 
 <h1>ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
 
-<!-- ================= PÀGINA 1: TEORIA ================= -->
+<!-- ================= PÀGINA 1: NOMÉS TEORIA ================= -->
 
-<div class="page active">
+<div class="page active" id="page1">
 
 <div class="readable">
 
@@ -111,14 +111,14 @@ button:hover{background:#21618c;}
 <button onclick="pauseReading()">Pausa</button>
 <button onclick="resumeReading()">Reprendre</button>
 <button onclick="stopReading()">Stop</button>
-<button onclick="nextPage()">Següent</button>
+<button onclick="goToPage(2)">Següent</button>
 </div>
 
 </div>
 
-<!-- ================= PÀGINA 2: PREGUNTES ================= -->
+<!-- ================= PÀGINA 2: NOMÉS PREGUNTES ================= -->
 
-<div class="page">
+<div class="page" id="page2">
 
 <div class="readable">
 
@@ -156,15 +156,13 @@ button:hover{background:#21618c;}
 <button onclick="pauseReading()">Pausa</button>
 <button onclick="resumeReading()">Reprendre</button>
 <button onclick="stopReading()">Stop</button>
-<button onclick="prevPage()">Anterior</button>
+<button onclick="goToPage(1)">Anterior</button>
 </div>
 
 </div>
 
 <script>
-let pages=document.querySelectorAll(".page");
-let currentPage=0;
-
+let currentPage = 1;
 let words=[];
 let currentIndex=0;
 let speaking=false;
@@ -174,24 +172,16 @@ window.onload=function(){
   prepareText();
 };
 
-function nextPage(){
+function goToPage(num){
   stopReading();
-  pages[currentPage].classList.remove("active");
-  currentPage=1;
-  pages[currentPage].classList.add("active");
-  prepareText();
-}
-
-function prevPage(){
-  stopReading();
-  pages[currentPage].classList.remove("active");
-  currentPage=0;
-  pages[currentPage].classList.add("active");
+  document.getElementById("page"+currentPage).classList.remove("active");
+  currentPage=num;
+  document.getElementById("page"+currentPage).classList.add("active");
   prepareText();
 }
 
 function prepareText(){
-  let readable=pages[currentPage].querySelector(".readable");
+  let readable=document.querySelector("#page"+currentPage+" .readable");
 
   readable.querySelectorAll("p, h2").forEach(el=>{
     let text=el.innerText;
@@ -203,7 +193,7 @@ function prepareText(){
     });
   });
 
-  words=pages[currentPage].querySelectorAll(".readable span");
+  words=document.querySelectorAll("#page"+currentPage+" .readable span");
   updateProgress();
 }
 
@@ -213,11 +203,11 @@ function startReading(selectedMode){
   mode=selectedMode;
 
   if(mode==="full"){
-    let text=pages[currentPage].querySelector(".readable").innerText;
+    let text=document.querySelector("#page"+currentPage+" .readable").innerText;
     let utter=new SpeechSynthesisUtterance(text);
     utter.lang="ca-ES";
     speechSynthesis.speak(utter);
-  }else{
+  } else {
     speakWord();
   }
 }
@@ -269,7 +259,7 @@ function stopReading(){
 
 function updateProgress(){
   let percent=(currentIndex/words.length)*100;
-  pages[currentPage].querySelector(".progress-bar").style.width=percent+"%";
+  document.querySelector("#page"+currentPage+" .progress-bar").style.width=percent+"%";
 }
 
 function selectOption(element,correct,resultId){
