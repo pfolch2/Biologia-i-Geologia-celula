@@ -14,7 +14,6 @@ body{
 h1{text-align:center;}
 
 .page{
-  display:none;
   max-width:900px;
   margin:auto;
   background:white;
@@ -23,19 +22,8 @@ h1{text-align:center;}
   box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
-.page.active{display:block;}
-
-.readable span{
-  cursor:default;
-}
-
-.highlight-normal{
-  background:#fff176;
-}
-
-.highlight-slow{
-  background:#81d4fa;
-}
+.highlight-normal{ background:#fff176; }
+.highlight-slow{ background:#81d4fa; }
 
 .controls{
   margin-top:20px;
@@ -79,9 +67,7 @@ button:hover{background:#21618c;}
   cursor:pointer;
 }
 
-.option:hover{
-  background:#f0f0f0;
-}
+.option:hover{ background:#f0f0f0; }
 
 .correct{color:green;font-weight:bold;}
 .incorrect{color:red;font-weight:bold;}
@@ -89,38 +75,74 @@ button:hover{background:#21618c;}
 </head>
 <body>
 
-<h1>ELS ÉSSERS VIUS I LA CÈL·LULA (Cicle Mitjà)</h1>
+<h1>ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
+
+<div class="page">
+
+<div class="readable">
+
+<h2>1. Què és un ésser viu?</h2>
+
+<p>Un ésser viu és tot allò que neix, creix, es relaciona i es reprodueix.</p>
+
+<p>Els éssers vius fan tres funcions vitals:</p>
+
+<p>Nutrició: mengen o fabriquen aliment per tenir energia.</p>
+
+<p>Relació: noten el que passa al seu voltant i reaccionen.</p>
+
+<p>Reproducció: poden tenir fills o descendència.</p>
+
+<h2>Preguntes</h2>
+
+<p>1. Quina és una funció vital?</p>
+<div>
+<span class="option" onclick="selectOption(this,false,'r1')">a) Dormir</span>
+<span class="option" onclick="selectOption(this,true,'r1')">b) Nutrició</span>
+<span class="option" onclick="selectOption(this,false,'r1')">c) Córrer</span>
+</div>
+<p id="r1"></p>
+
+<p>2. Què fa un ésser viu quan es relaciona?</p>
+<div>
+<span class="option" onclick="selectOption(this,false,'r2')">a) Dorm tot el dia</span>
+<span class="option" onclick="selectOption(this,true,'r2')">b) Nota el que passa i respon</span>
+<span class="option" onclick="selectOption(this,false,'r2')">c) No fa res</span>
+</div>
+<p id="r2"></p>
+
+<p>Resposta curta:</p>
+<p>Escriu el nom d’una funció vital.</p>
+
+</div>
+
+<div class="progress-container">
+<div class="progress-bar"></div>
+</div>
+
+<div class="controls">
+<button onclick="startReading('full')">Lectura completa</button>
+<button onclick="startReading('normal')">Lectura normal</button>
+<button onclick="startReading('slow')">Lectura lenta</button>
+<button onclick="pauseReading()">Pausa</button>
+<button onclick="resumeReading()">Reprendre</button>
+<button onclick="stopReading()">Stop</button>
+</div>
+
+</div>
 
 <script>
-let pages;
-let currentPage=0;
-
 let words=[];
 let currentIndex=0;
 let speaking=false;
 let mode="normal";
-let slowDelayActive=false;
 
 window.onload=function(){
-  pages=document.querySelectorAll(".page");
-  pages[0].classList.add("active");
   prepareText();
 };
 
-function showPage(index){
-  stopReading();
-  pages[currentPage].classList.remove("active");
-  currentPage=index;
-  pages[currentPage].classList.add("active");
-  prepareText();
-}
-
-function nextPage(){ if(currentPage<pages.length-1) showPage(currentPage+1);}
-function prevPage(){ if(currentPage>0) showPage(currentPage-1);}
-
 function prepareText(){
-  let readable=pages[currentPage].querySelector(".readable");
-  if(!readable) return;
+  let readable=document.querySelector(".readable");
 
   readable.querySelectorAll("p, h2").forEach(el=>{
     let text=el.innerText;
@@ -132,7 +154,7 @@ function prepareText(){
     });
   });
 
-  words=readable.querySelectorAll("span");
+  words=document.querySelectorAll(".readable span");
   updateProgress();
 }
 
@@ -140,7 +162,12 @@ function startReading(selectedMode){
   stopReading();
   speaking=true;
   mode=selectedMode;
-  speakWord();
+
+  if(mode==="full"){
+    readFullText();
+  }else{
+    speakWord();
+  }
 }
 
 function speakWord(){
@@ -174,13 +201,15 @@ function speakWord(){
   speechSynthesis.speak(utter);
 }
 
-function pauseReading(){
-  speechSynthesis.pause();
+function readFullText(){
+  let text=document.querySelector(".readable").innerText;
+  let utter=new SpeechSynthesisUtterance(text);
+  utter.lang="ca-ES";
+  speechSynthesis.speak(utter);
 }
 
-function resumeReading(){
-  speechSynthesis.resume();
-}
+function pauseReading(){ speechSynthesis.pause(); }
+function resumeReading(){ speechSynthesis.resume(); }
 
 function stopReading(){
   speaking=false;
@@ -195,8 +224,7 @@ function stopReading(){
 
 function updateProgress(){
   let percent=(currentIndex/words.length)*100;
-  let bar=pages[currentPage].querySelector(".progress-bar");
-  if(bar) bar.style.width=percent+"%";
+  document.querySelector(".progress-bar").style.width=percent+"%";
 }
 
 function selectOption(element,correct,resultId){
@@ -212,82 +240,6 @@ function selectOption(element,correct,resultId){
   }
 }
 </script>
-
-<!-- ================= TEORIA ================= -->
-
-<div class="page">
-<div class="readable">
-
-<h2>1. Què és un ésser viu?</h2>
-
-<p>Un ésser viu és tot allò que neix, creix, es relaciona i es reprodueix.</p>
-
-<p>Els éssers vius fan tres funcions vitals:</p>
-
-<p>Nutrició: mengen o fabriquen aliment per tenir energia.</p>
-
-<p>Relació: noten el que passa al seu voltant i reaccionen.</p>
-
-<p>Reproducció: poden tenir fills o descendència.</p>
-
-</div>
-
-<div class="progress-container">
-<div class="progress-bar"></div>
-</div>
-
-<div class="controls">
-<button onclick="startReading('normal')">Lectura normal</button>
-<button onclick="startReading('slow')">Lectura lenta</button>
-<button onclick="pauseReading()">Pausa</button>
-<button onclick="resumeReading()">Reprendre</button>
-<button onclick="stopReading()">Stop</button>
-<button onclick="nextPage()">Següent</button>
-</div>
-</div>
-
-<!-- ================= PREGUNTES ================= -->
-
-<div class="page">
-<div class="readable">
-
-<h2>Preguntes</h2>
-
-<p>1. Quina és una funció vital?</p>
-<div>
-<span class="option" onclick="selectOption(this,false,'r1')">a) Dormir</span>
-<span class="option" onclick="selectOption(this,true,'r1')">b) Nutrició</span>
-<span class="option" onclick="selectOption(this,false,'r1')">c) Córrer</span>
-</div>
-<p id="r1"></p>
-
-<p>2. Què fa un ésser viu quan es relaciona?</p>
-<div>
-<span class="option" onclick="selectOption(this,false,'r2')">a) Dorm tot el dia</span>
-<span class="option" onclick="selectOption(this,true,'r2')">b) Nota el que passa i respon</span>
-<span class="option" onclick="selectOption(this,false,'r2')">c) No fa res</span>
-</div>
-<p id="r2"></p>
-
-<p>Resposta curta:</p>
-<p>Escriu el nom d’una funció vital.</p>
-
-</div>
-
-<div class="progress-container">
-<div class="progress-bar"></div>
-</div>
-
-<div class="controls">
-<button onclick="startReading('normal')">Lectura normal</button>
-<button onclick="startReading('slow')">Lectura lenta</button>
-<button onclick="pauseReading()">Pausa</button>
-<button onclick="resumeReading()">Reprendre</button>
-<button onclick="stopReading()">Stop</button>
-<button onclick="prevPage()">Anterior</button>
-</div>
-
-</div>
 
 </body>
 </html>
