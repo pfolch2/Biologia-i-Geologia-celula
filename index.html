@@ -14,6 +14,7 @@ body{
 h1{text-align:center;}
 
 .page{
+  display:none;
   max-width:900px;
   margin:auto;
   background:white;
@@ -21,6 +22,8 @@ h1{text-align:center;}
   border-radius:15px;
   box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
+
+.page.active{display:block;}
 
 .highlight-normal{ background:#fff176; }
 .highlight-slow{ background:#81d4fa; }
@@ -77,7 +80,9 @@ button:hover{background:#21618c;}
 
 <h1>ELS ÉSSERS VIUS I LA CÈL·LULA</h1>
 
-<div class="page">
+<!-- ================= PÀGINA 1: TEORIA ================= -->
+
+<div class="page active">
 
 <div class="readable">
 
@@ -92,6 +97,30 @@ button:hover{background:#21618c;}
 <p>Relació: noten el que passa al seu voltant i reaccionen.</p>
 
 <p>Reproducció: poden tenir fills o descendència.</p>
+
+</div>
+
+<div class="progress-container">
+<div class="progress-bar"></div>
+</div>
+
+<div class="controls">
+<button onclick="startReading('full')">Lectura completa</button>
+<button onclick="startReading('normal')">Lectura normal</button>
+<button onclick="startReading('slow')">Lectura lenta</button>
+<button onclick="pauseReading()">Pausa</button>
+<button onclick="resumeReading()">Reprendre</button>
+<button onclick="stopReading()">Stop</button>
+<button onclick="nextPage()">Següent</button>
+</div>
+
+</div>
+
+<!-- ================= PÀGINA 2: PREGUNTES ================= -->
+
+<div class="page">
+
+<div class="readable">
 
 <h2>Preguntes</h2>
 
@@ -127,11 +156,15 @@ button:hover{background:#21618c;}
 <button onclick="pauseReading()">Pausa</button>
 <button onclick="resumeReading()">Reprendre</button>
 <button onclick="stopReading()">Stop</button>
+<button onclick="prevPage()">Anterior</button>
 </div>
 
 </div>
 
 <script>
+let pages=document.querySelectorAll(".page");
+let currentPage=0;
+
 let words=[];
 let currentIndex=0;
 let speaking=false;
@@ -141,8 +174,24 @@ window.onload=function(){
   prepareText();
 };
 
+function nextPage(){
+  stopReading();
+  pages[currentPage].classList.remove("active");
+  currentPage=1;
+  pages[currentPage].classList.add("active");
+  prepareText();
+}
+
+function prevPage(){
+  stopReading();
+  pages[currentPage].classList.remove("active");
+  currentPage=0;
+  pages[currentPage].classList.add("active");
+  prepareText();
+}
+
 function prepareText(){
-  let readable=document.querySelector(".readable");
+  let readable=pages[currentPage].querySelector(".readable");
 
   readable.querySelectorAll("p, h2").forEach(el=>{
     let text=el.innerText;
@@ -154,7 +203,7 @@ function prepareText(){
     });
   });
 
-  words=document.querySelectorAll(".readable span");
+  words=pages[currentPage].querySelectorAll(".readable span");
   updateProgress();
 }
 
@@ -164,7 +213,10 @@ function startReading(selectedMode){
   mode=selectedMode;
 
   if(mode==="full"){
-    readFullText();
+    let text=pages[currentPage].querySelector(".readable").innerText;
+    let utter=new SpeechSynthesisUtterance(text);
+    utter.lang="ca-ES";
+    speechSynthesis.speak(utter);
   }else{
     speakWord();
   }
@@ -201,13 +253,6 @@ function speakWord(){
   speechSynthesis.speak(utter);
 }
 
-function readFullText(){
-  let text=document.querySelector(".readable").innerText;
-  let utter=new SpeechSynthesisUtterance(text);
-  utter.lang="ca-ES";
-  speechSynthesis.speak(utter);
-}
-
 function pauseReading(){ speechSynthesis.pause(); }
 function resumeReading(){ speechSynthesis.resume(); }
 
@@ -224,7 +269,7 @@ function stopReading(){
 
 function updateProgress(){
   let percent=(currentIndex/words.length)*100;
-  document.querySelector(".progress-bar").style.width=percent+"%";
+  pages[currentPage].querySelector(".progress-bar").style.width=percent+"%";
 }
 
 function selectOption(element,correct,resultId){
