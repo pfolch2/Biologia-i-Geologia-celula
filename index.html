@@ -16,7 +16,7 @@ h1{text-align:center;}
 
 .page{
   display:none;
-  max-width:1000px;
+  max-width:900px;
   margin:auto;
   background:white;
   padding:30px;
@@ -30,8 +30,13 @@ h1{text-align:center;}
   cursor:pointer;
 }
 
-.highlight{
-  background:yellow;
+.highlight-normal{
+  background:#fff176;
+  border-radius:4px;
+}
+
+.highlight-slow{
+  background:#81d4fa;
   border-radius:4px;
 }
 
@@ -56,10 +61,10 @@ button:hover{background:#21618c;}
 
 .progress-container{
   width:100%;
-  background:#ddd;
   height:15px;
+  background:#ddd;
   border-radius:10px;
-  margin-top:10px;
+  margin-top:15px;
 }
 
 .progress-bar{
@@ -67,6 +72,7 @@ button:hover{background:#21618c;}
   width:0%;
   background:#28b463;
   border-radius:10px;
+  transition:width 0.2s;
 }
 
 .correct{color:green;font-weight:bold;}
@@ -86,11 +92,26 @@ let currentIndex=0;
 let speaking=false;
 let paused=false;
 let mode="normal";
+let voices=[];
 
 window.onload=function(){
   pages=document.querySelectorAll(".page");
   pages[0].classList.add("active");
   prepareText();
+  loadVoices();
+};
+
+function loadVoices(){
+  voices = speechSynthesis.getVoices();
+  if(!voices.length){
+    speechSynthesis.onvoiceschanged = () => {
+      voices = speechSynthesis.getVoices();
+    };
+  }
+}
+
+function getFemaleVoice(){
+  return voices.find(v => v.lang.includes("ca")) || null;
 }
 
 function showPage(index){
@@ -108,20 +129,18 @@ function prepareText(){
   let readable=pages[currentPage].querySelector(".readable");
   if(!readable) return;
 
-  let textNodes=[];
-  readable.querySelectorAll("*").forEach(el=>{
-    if(el.tagName!=="BUTTON"){
-      let text=el.innerText;
-      el.innerHTML="";
-      text.split(" ").forEach((word)=>{
-        let span=document.createElement("span");
-        span.textContent=word+" ";
-        el.appendChild(span);
-      });
-    }
+  readable.querySelectorAll("p, h2").forEach(el=>{
+    let text=el.innerText;
+    el.innerHTML="";
+    text.split(" ").forEach((word)=>{
+      let span=document.createElement("span");
+      span.textContent=word+" ";
+      el.appendChild(span);
+    });
   });
 
   words=readable.querySelectorAll("span");
+
   words.forEach((span,i)=>{
     span.onclick=function(){
       currentIndex=i;
@@ -142,13 +161,19 @@ function startReading(selectedMode){
 
 function speakWord(){
   if(!speaking || currentIndex>=words.length) return;
+  if(paused) return;
 
-  words.forEach(w=>w.classList.remove("highlight"));
+  words.forEach(w=>{
+    w.classList.remove("highlight-normal");
+    w.classList.remove("highlight-slow");
+  });
+
   let word=words[currentIndex];
-  word.classList.add("highlight");
+  word.classList.add(mode==="normal"?"highlight-normal":"highlight-slow");
 
   let utter=new SpeechSynthesisUtterance(word.textContent);
   utter.lang="ca-ES";
+  utter.voice=getFemaleVoice();
   utter.rate=1;
 
   utter.onend=function(){
@@ -169,14 +194,15 @@ function speakWord(){
 }
 
 function pauseReading(){
-  speechSynthesis.pause();
   paused=true;
+  speechSynthesis.pause();
 }
 
 function resumeReading(){
   if(paused){
     paused=false;
     speechSynthesis.resume();
+    speakWord();
   }
 }
 
@@ -184,7 +210,10 @@ function stopReading(){
   speaking=false;
   paused=false;
   speechSynthesis.cancel();
-  words.forEach(w=>w.classList.remove("highlight"));
+  words.forEach(w=>{
+    w.classList.remove("highlight-normal");
+    w.classList.remove("highlight-slow");
+  });
   currentIndex=0;
   updateProgress();
 }
@@ -206,19 +235,28 @@ function checkAnswer(name,correct,resultId){
 }
 </script>
 
-<!-- ================= APARTAT 1 ================= -->
+<!-- ================= TEORIA ================= -->
 
 <div class="page">
 <div class="readable">
-<h2>Què és un ésser viu?</h2>
+
+<h2>1. Què és un ésser viu?</h2>
+
 <p>Un ésser viu és tot allò que neix, creix, es relaciona i es reprodueix.</p>
+
 <p>Els éssers vius fan tres funcions vitals:</p>
+
 <p>Nutrició: mengen o fabriquen aliment per tenir energia.</p>
+
 <p>Relació: noten el que passa al seu voltant i reaccionen.</p>
+
 <p>Reproducció: poden tenir fills o descendència.</p>
+
 </div>
 
-<div class="progress-container"><div class="progress-bar"></div></div>
+<div class="progress-container">
+<div class="progress-bar"></div>
+</div>
 
 <div class="controls">
 <button onclick="startReading('normal')">Lectura normal</button>
@@ -230,28 +268,45 @@ function checkAnswer(name,correct,resultId){
 </div>
 </div>
 
+<!-- ================= PREGUNTES ================= -->
+
 <div class="page">
 <div class="readable">
+
 <h2>Preguntes</h2>
 
-<p>Quina és una funció vital?</p>
+<p>1. Quina és una funció vital?</p>
+<p>a) Dormir</p>
+<p>b) Nutrició</p>
+<p>c) Córrer</p>
+
+<p>2. Què fa un ésser viu quan es relaciona?</p>
+<p>a) Dorm tot el dia</p>
+<p>b) Nota el que passa i respon</p>
+<p>c) No fa res</p>
+
+<p>Resposta curta:</p>
+<p>Escriu el nom d’una funció vital.</p>
+
+</div>
+
 <input type="radio" name="q1" value="a"> Dormir<br>
 <input type="radio" name="q1" value="b"> Nutrició<br>
 <input type="radio" name="q1" value="c"> Córrer<br>
 <button onclick="checkAnswer('q1','b','r1')">Corregir</button>
 <p id="r1"></p>
 
-<p>Què fa un ésser viu quan es relaciona?</p>
+<br>
+
 <input type="radio" name="q2" value="a"> Dorm tot el dia<br>
 <input type="radio" name="q2" value="b"> Nota el que passa i respon<br>
 <input type="radio" name="q2" value="c"> No fa res<br>
 <button onclick="checkAnswer('q2','b','r2')">Corregir</button>
 <p id="r2"></p>
 
-<p>Resposta curta: Escriu el nom d’una funció vital.</p>
+<div class="progress-container">
+<div class="progress-bar"></div>
 </div>
-
-<div class="progress-container"><div class="progress-bar"></div></div>
 
 <div class="controls">
 <button onclick="startReading('normal')">Lectura normal</button>
@@ -260,11 +315,9 @@ function checkAnswer(name,correct,resultId){
 <button onclick="resumeReading()">Reprendre</button>
 <button onclick="stopReading()">Stop</button>
 <button onclick="prevPage()">Anterior</button>
-<button onclick="nextPage()">Següent</button>
-</div>
 </div>
 
-<!-- Els apartats 2 i 3 segueixen exactament la mateixa estructura -->
+</div>
 
 </body>
 </html>
