@@ -8,7 +8,6 @@
 body{
   font-family: Arial, sans-serif;
   background: linear-gradient(to right,#d6eaf8,#ebf5fb);
-  margin:0;
   padding:20px;
 }
 
@@ -27,7 +26,7 @@ h1{text-align:center;}
 .page.active{display:block;}
 
 .readable span{
-  cursor:pointer;
+  cursor:default;
 }
 
 .highlight-normal{
@@ -75,8 +74,8 @@ button:hover{background:#21618c;}
 
 .option{
   display:block;
-  margin:5px 0;
-  padding:5px;
+  margin:6px 0;
+  padding:6px;
   cursor:pointer;
 }
 
@@ -99,29 +98,14 @@ let currentPage=0;
 let words=[];
 let currentIndex=0;
 let speaking=false;
-let paused=false;
 let mode="normal";
-let voices=[];
+let slowDelayActive=false;
 
 window.onload=function(){
   pages=document.querySelectorAll(".page");
   pages[0].classList.add("active");
   prepareText();
-  loadVoices();
 };
-
-function loadVoices(){
-  voices = speechSynthesis.getVoices();
-  if(!voices.length){
-    speechSynthesis.onvoiceschanged = () => {
-      voices = speechSynthesis.getVoices();
-    };
-  }
-}
-
-function getVoice(){
-  return voices.find(v => v.lang.includes("ca")) || null;
-}
 
 function showPage(index){
   stopReading();
@@ -141,7 +125,7 @@ function prepareText(){
   readable.querySelectorAll("p, h2").forEach(el=>{
     let text=el.innerText;
     el.innerHTML="";
-    text.split(" ").forEach((word)=>{
+    text.split(" ").forEach(word=>{
       let span=document.createElement("span");
       span.textContent=word+" ";
       el.appendChild(span);
@@ -149,27 +133,18 @@ function prepareText(){
   });
 
   words=readable.querySelectorAll("span");
-
-  words.forEach((span,i)=>{
-    span.onclick=function(){
-      currentIndex=i;
-      startReading(mode);
-    }
-  });
-
   updateProgress();
 }
 
 function startReading(selectedMode){
-  speechSynthesis.cancel();
+  stopReading();
   speaking=true;
-  paused=false;
   mode=selectedMode;
   speakWord();
 }
 
 function speakWord(){
-  if(!speaking || currentIndex>=words.length || paused) return;
+  if(!speaking || currentIndex>=words.length) return;
 
   words.forEach(w=>{
     w.classList.remove("highlight-normal");
@@ -181,7 +156,6 @@ function speakWord(){
 
   let utter=new SpeechSynthesisUtterance(word.textContent);
   utter.lang="ca-ES";
-  utter.voice=getVoice();
 
   utter.onend=function(){
     if(mode==="slow"){
@@ -190,7 +164,7 @@ function speakWord(){
         updateProgress();
         speakWord();
       },1000);
-    }else{
+    } else {
       currentIndex++;
       updateProgress();
       speakWord();
@@ -201,20 +175,15 @@ function speakWord(){
 }
 
 function pauseReading(){
-  paused=true;
-  speechSynthesis.cancel();
+  speechSynthesis.pause();
 }
 
 function resumeReading(){
-  if(paused){
-    paused=false;
-    speakWord();
-  }
+  speechSynthesis.resume();
 }
 
 function stopReading(){
   speaking=false;
-  paused=false;
   speechSynthesis.cancel();
   words.forEach(w=>{
     w.classList.remove("highlight-normal");
@@ -231,8 +200,8 @@ function updateProgress(){
 }
 
 function selectOption(element,correct,resultId){
-  let options=element.parentNode.querySelectorAll(".option");
-  options.forEach(o=>o.style.fontWeight="normal");
+  let siblings=element.parentNode.querySelectorAll(".option");
+  siblings.forEach(o=>o.style.fontWeight="normal");
 
   element.style.fontWeight="bold";
 
@@ -286,17 +255,17 @@ function selectOption(element,correct,resultId){
 
 <p>1. Quina és una funció vital?</p>
 <div>
-<span class="option" onclick="selectOption(this,false,'r1')">Dormir</span>
-<span class="option" onclick="selectOption(this,true,'r1')">Nutrició</span>
-<span class="option" onclick="selectOption(this,false,'r1')">Córrer</span>
+<span class="option" onclick="selectOption(this,false,'r1')">a) Dormir</span>
+<span class="option" onclick="selectOption(this,true,'r1')">b) Nutrició</span>
+<span class="option" onclick="selectOption(this,false,'r1')">c) Córrer</span>
 </div>
 <p id="r1"></p>
 
 <p>2. Què fa un ésser viu quan es relaciona?</p>
 <div>
-<span class="option" onclick="selectOption(this,false,'r2')">Dorm tot el dia</span>
-<span class="option" onclick="selectOption(this,true,'r2')">Nota el que passa i respon</span>
-<span class="option" onclick="selectOption(this,false,'r2')">No fa res</span>
+<span class="option" onclick="selectOption(this,false,'r2')">a) Dorm tot el dia</span>
+<span class="option" onclick="selectOption(this,true,'r2')">b) Nota el que passa i respon</span>
+<span class="option" onclick="selectOption(this,false,'r2')">c) No fa res</span>
 </div>
 <p id="r2"></p>
 
